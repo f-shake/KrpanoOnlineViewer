@@ -308,7 +308,7 @@
             try {
                 showProgress('准备上传', 0);
 
-                const response = await fetch('/api/upload', {
+                const response = await fetch('api/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -338,7 +338,7 @@
                 if (!currentProcessingId) return;
 
                 try {
-                    const response = await fetch(`/api/status/${currentProcessingId}`);
+                    const response = await fetch(`api/status/${currentProcessingId}`);
                     if (!response.ok) {
                         throw new Error('状态检查失败');
                     }
@@ -363,7 +363,7 @@
                                 // window.open(newURL, '_blank');
                             }, 1000);
 
-                            //loadPanoramaList();
+                            loadPanoramaList();
 
                             break;
                         case 'error':
@@ -406,7 +406,7 @@
 
         async function loadPanoramaList() {
             try {
-                const response = await fetch('/api/panoramas');
+                const response = await fetch('api/panoramas');
                 const panoramas = await response.json();
 
                 if (panoramas.length === 0) {
