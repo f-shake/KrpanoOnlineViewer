@@ -1,4 +1,4 @@
-using KrpanoOnlineViewer;
+ï»¿using KrpanoOnlineViewer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
@@ -41,9 +41,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+ConfigureAccessPassword(app, builder);
+
 InitializeStaticFiles(app);
 
-// API Â·ÓÉ
+// API è·¯ç”±
 var api = app.MapGroup("/api");
 api.MapGet("/panoramas", GetAllPanoromas).WithOpenApi();
 api.MapPost("/upload", UploadFile).DisableAntiforgery();
@@ -55,19 +57,19 @@ async Task<IResult> UploadFile(HttpContext context, PanoramaService panoramaServ
 {
     if (file == null || file.Length == 0)
     {
-        return Results.BadRequest("Ã»ÓĞÉÏ´«ÎÄ¼ş");
+        return Results.BadRequest("æ²¡æœ‰ä¸Šä¼ æ–‡ä»¶");
     }
 
     if (file.Length > 500 * 1024 * 1024)
     {
-        return Results.BadRequest("ÎÄ¼ş´óĞ¡¹ı´ó£¨ÏŞÖÆÎª500MB£©");
+        return Results.BadRequest("æ–‡ä»¶å¤§å°è¿‡å¤§ï¼ˆé™åˆ¶ä¸º500MBï¼‰");
     }
 
     var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".tif", ".tiff" };
     var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
     if (!allowedExtensions.Contains(extension))
     {
-        return Results.BadRequest("²»Ö§³ÖµÄÎÄ¼ş¸ñÊ½");
+        return Results.BadRequest("ä¸æ”¯æŒçš„æ–‡ä»¶æ ¼å¼");
     }
 
     var panoramaId = await panoramaService.StartProcessingAsync(file);
@@ -104,7 +106,7 @@ static void InitializeStaticFiles(WebApplication app)
             }
         }
 
-        // ¶ÔÓÚÆäËûÂ·¾¶£¬·µ»Ø 404
+        // å¯¹äºå…¶ä»–è·¯å¾„ï¼Œè¿”å› 404
         context.Response.StatusCode = 404;
     });
 }
@@ -113,4 +115,28 @@ async Task<IResult> GetAllPanoromas(PanoramaService panoramaService)
 {
     var panoramas = await panoramaService.GetAllPanoramasAsync();
     return Results.Ok(panoramas);
+}
+
+void ConfigureAccessPassword(WebApplication webApplication, WebApplicationBuilder webApplicationBuilder)
+{
+    webApplication.Use(async (context, next) =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            var configPassword = webApplicationBuilder.Configuration["AccessPassword"];
+            if (!string.IsNullOrEmpty(configPassword))
+            {
+                var requestPassword = context.Request.Headers["X-Access-Token"].FirstOrDefault();
+
+                if (requestPassword != configPassword)
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync("Unauthorized: å¯†ç é”™è¯¯");
+                    return;
+                }
+            }
+        }
+
+        await next();
+    });
 }

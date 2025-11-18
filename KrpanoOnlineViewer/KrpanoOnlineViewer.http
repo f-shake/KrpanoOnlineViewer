@@ -1,6 +1,0 @@
-@KrpanoOnlineViewer_HostAddress = http://localhost:5136
-
-GET {{KrpanoOnlineViewer_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
