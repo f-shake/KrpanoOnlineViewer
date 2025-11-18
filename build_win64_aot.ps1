@@ -1,0 +1,1 @@
+dotnet publish KrpanoOnlineViewer -c Release -o Publish  --runtime win-x64 

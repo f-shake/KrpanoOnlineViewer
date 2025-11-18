@@ -10,7 +10,7 @@ public class PanoramaService
     private readonly Dictionary<string, ProcessingStatus> processingStatus;
     private readonly IConfiguration configuration;
 
-    public PanoramaService(IWebHostEnvironment env,IConfiguration configuration)
+    public PanoramaService(IWebHostEnvironment env, IConfiguration configuration)
     {
         basePath = env.ContentRootPath;
         panoRootPath = Path.Combine(basePath, "wwwroot", "panoramas");
@@ -157,6 +157,7 @@ public class PanoramaService
         }
         catch (Exception ex)
         {
+            Debug.WriteLine(ex);
             throw;
         }
     }
@@ -174,7 +175,7 @@ public class PanoramaService
             return new List<PanoramaInfo>();
 
         var json = await File.ReadAllTextAsync(infoFile);
-        return System.Text.Json.JsonSerializer.Deserialize<List<PanoramaInfo>>(json) ?? new List<PanoramaInfo>();
+        return System.Text.Json.JsonSerializer.Deserialize(json, AppJsonSerializerContext.Default.ListPanoramaInfo) ?? [];
     }
 
     private async Task SavePanoramaInfoAsync(PanoramaInfo info)
@@ -183,10 +184,7 @@ public class PanoramaService
         panoramas.Add(info);
 
         var infoFile = Path.Combine(panoRootPath, "panoramas.json");
-        var json = System.Text.Json.JsonSerializer.Serialize(panoramas, new System.Text.Json.JsonSerializerOptions
-        {
-            WriteIndented = true
-        });
+        var json = System.Text.Json.JsonSerializer.Serialize(panoramas, AppJsonSerializerContext.Default.ListPanoramaInfo);
 
         await File.WriteAllTextAsync(infoFile, json);
     }

@@ -219,7 +219,7 @@
                     <div class="progress-bar">
                         <div class="progress-fill" id="progressFill"></div>
                     </div>
-                    <div class="progress-text" id="progressText">准备上传...</div>
+                    <div class="progress-text" id="progressText">准备上传</div>
                 </div>
 
                 <div class="status-message" id="statusMessage"></div>
@@ -229,7 +229,7 @@
                 <h2>已有全景图</h2>
                 <div class="panorama-list" id="panoramaList">
                     <div style="text-align: center; padding: 40px; color: #7f8c8d;">
-                        加载中...
+                        加载中
                     </div>
                 </div>
             </div>
@@ -281,6 +281,7 @@
         }
 
         function handleFileSelect(e) {
+            e.preventDefault();
             const file = e.target.files[0];
             if (file) {
                 processFile(file);
@@ -305,7 +306,7 @@
             formData.append('file', file);
 
             try {
-                showProgress('准备上传...', 0);
+                showProgress('准备上传', 0);
 
                 const response = await fetch('/api/upload', {
                     method: 'POST',
@@ -319,7 +320,7 @@
                 const result = await response.json();
                 currentProcessingId = result.id;
 
-                showProgress('开始处理...', 10);
+                showProgress('开始处理', 10);
                 startStatusPolling();
 
             } catch (error) {
@@ -350,15 +351,20 @@
                             showStatus('全景图转换完成!', 'success');
                             clearInterval(statusCheckInterval);
 
-                            // 加载更新后的列表
-                            loadPanoramaList();
-
-                            // 自动跳转到生成的全景页面
                             setTimeout(() => {
-                                const baseURL = document.URL.replace('/index.html', '');
-                                const newURL = `${baseURL}/${currentProcessingId}/tour.html`.replace('//', '/');
+                                // 方法1：使用相对路径（推荐）
+                                const newURL = `panoramas/${currentProcessingId}/tour.html`;
+                                console.log('Opening URL:', newURL);
                                 window.open(newURL, '_blank');
-                            }, 100);
+
+                                // 或者方法2：构建绝对路径
+                                // const baseURL = window.location.origin;
+                                // const newURL = `${baseURL}/panoramas/${currentProcessingId}/tour.html`;
+                                // window.open(newURL, '_blank');
+                            }, 1000);
+
+                            //loadPanoramaList();
+
                             break;
                         case 'error':
                             showStatus('处理失败: ' + status.error, 'error');
