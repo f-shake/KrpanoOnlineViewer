@@ -4,547 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>全景图转换工具</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        header {
-            background: #2c3e50;
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #bdc3c7;
-            font-size: 1.1em;
-        }
-
-        .main-content {
-            padding: 40px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .upload-section, .list-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 10px;
-            border: 2px dashed #dee2e6;
-        }
-
-        .upload-area {
-            border: 3px dashed #3498db;
-            border-radius: 10px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: #ecf0f1;
-        }
-
-            .upload-area:hover {
-                border-color: #2980b9;
-                background: #d6dbdf;
-            }
-
-            .upload-area.highlight {
-                border-color: #27ae60;
-                background: #d5f4e6;
-            }
-
-        .upload-icon {
-            font-size: 48px;
-            color: #3498db;
-            margin-bottom: 15px;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .progress-container {
-            margin-top: 20px;
-            display: none;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: #ecf0f1;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #3498db, #2ecc71);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .progress-text {
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-
-        .panorama-list {
-            margin-top: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .panorama-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease;
-        }
-
-
-        .panorama-info h3 {
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .panorama-meta {
-            color: #7f8c8d;
-            font-size: 0.8em;
-        }
-
-        .view-btn {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            width: 72px;
-            text-align: center;
-        }
-
-            .view-btn:hover {
-                background: #219653;
-            }
-
-        .status-message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            text-align: center;
-            display: none;
-        }
-
-        .status-success {
-            background: #d5f4e6;
-            color: #27ae60;
-            border: 1px solid #27ae60;
-        }
-
-        .status-error {
-            background: #fadbd8;
-            color: #e74c3c;
-            border: 1px solid #e74c3c;
-        }
-
-        .status-processing {
-            background: #d6eaf8;
-            color: #3498db;
-            border: 1px solid #3498db;
-        }
-    </style>
+    <link rel="stylesheet" href="main.css"/>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>全景图转换查看工具</h1>
-            <p class="subtitle">上传全景图，自动转换为交互式全景漫游</p>
-            <button id="changePasswordBtn" style="position:absolute; top:28px; right:28px; padding:6px 12px; border:none; border-radius:12px; background:#2ecc71; color:white; cursor:pointer;">修改密码</button>
-        </header>
+<div class="container">
+    <header>
+        <h1>全景图转换查看工具</h1>
+        <p class="subtitle">上传全景图，自动转换为交互式全景漫游</p>
+        <button id="changePasswordBtn">修改密码</button>
+    </header>
 
-        <div class="main-content">
-            <div class="upload-section">
-                <h2>上传全景图</h2>
-                <p style="margin: 15px 0; color: #7f8c8d;">
-                    支持 JPG、PNG、TIFF 格式
-                </p>
+    <div class="main-content">
+        <div class="upload-section">
+            <h2>上传全景图</h2>
+            <p style="margin: 12px 0; color: #7f8c8d; font-size: 0.9em;">
+                支持 JPG、PNG、TIFF 格式
+            </p>
 
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📁</div>
-                    <h3>点击选择文件或拖拽到此区域</h3>
-                    <p>最大支持 500MB</p>
-                    <input type="file" id="fileInput" class="file-input" accept=".jpg,.jpeg,.png,.tif,.tiff">
-                </div>
-
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                    <div class="progress-text" id="progressText">正在上传</div>
-                </div>
-
-                <div class="status-message" id="statusMessage"></div>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <h3>点击选择文件或拖拽到此区域</h3>
+                <p>最大支持 500MB</p>
+                <input type="file" id="fileInput" class="file-input" accept=".jpg,.jpeg,.png,.tif,.tiff">
             </div>
 
-            <div class="list-section">
-                <h2>已有全景图</h2>
-                <div class="panorama-list" id="panoramaList">
-                    <div style="text-align: center; padding: 40px; color: #7f8c8d;">
-                        加载中
-                    </div>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">正在上传</div>
+            </div>
+
+            <div class="status-message" id="statusMessage"></div>
+        </div>
+
+        <div class="list-section">
+            <h2>已有全景图</h2>
+            <div class="panorama-list" id="panoramaList">
+                <div style="text-align: center; padding: 30px; color: #7f8c8d; font-size: 0.9em;">
+                    加载中
                 </div>
             </div>
         </div>
-
-        <div id="passwordModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
-            <div style="background:white; padding:30px; border-radius:12px; max-width:400px; width:90%; text-align:center;">
-                <h2>请输入访问密码</h2>
-                <input type="password" id="passwordInput" placeholder="密码" style="width:80%; padding:8px; margin:15px 0; border-radius:6px; border:1px solid #ccc; font-size:16px;">
-                <div>
-                    <button id="passwordSubmit" style="padding:8px 16px; border:none; border-radius:6px; background:#3498db; color:white; cursor:pointer;">确认</button>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <script>
-        // DOM元素
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const statusMessage = document.getElementById('statusMessage');
-        const panoramaList = document.getElementById('panoramaList');
+    <div id="passwordModal">
+        <div>
+            <h2>请输入访问密码</h2>
+            <input type="password" id="passwordInput" placeholder="密码">
+            <div>
+                <button id="passwordSubmit">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // 当前处理的ID
-        let currentProcessingId = null;
-        let statusCheckInterval = null;
-
-        // 事件监听器
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', handleDragOver);
-        uploadArea.addEventListener('dragleave', handleDragLeave);
-        uploadArea.addEventListener('drop', handleDrop);
-        fileInput.addEventListener('change', handleFileSelect);
-
-
-        // --- Cookie 工具函数 ---
-        function setCookie(name, value, days) {
-            const expires = new Date(Date.now() + days*24*60*60*1000).toUTCString();
-            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-        }
-
-        function getCookie(name) {
-            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-            return match ? decodeURIComponent(match[2]) : null;
-        }
-
-        // --- 密码处理 ---
-        let accessPassword = getCookie('accessPassword');
-
-        // 加载全景图列表
-        loadPanoramaList();
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            uploadArea.classList.add('highlight');
-        }
-
-        function handleDragLeave(e) {
-            e.preventDefault();
-            uploadArea.classList.remove('highlight');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            uploadArea.classList.remove('highlight');
-
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                processFile(files[0]);
-            }
-        }
-
-        function handleFileSelect(e) {
-            e.preventDefault();
-            const file = e.target.files[0];
-            if (file) {
-                processFile(file);
-            }
-        }
-
-        async function processFile(file) {
-            // 验证文件类型
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/tiff'];
-            if (!allowedTypes.includes(file.type)) {
-                showStatus('请选择 JPG、PNG 或 TIFF 格式的图片文件', 'error');
-                return;
-            }
-
-            // 验证文件大小 (500MB)
-            if (file.size > 500 * 1024 * 1024) {
-                showStatus('文件大小不能超过 500MB', 'error');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                showProgress('正在上传', 0);
-
-                const response = await fetchWithPassword('api/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error('上传失败');
-                }
-
-                const result = await response.json();
-                currentProcessingId = result.id;
-
-                showProgress('开始处理', 30);
-                startStatusPolling();
-
-            } catch (error) {
-                showStatus('上传失败: ' + error.message, 'error');
-                hideProgress();
-            }
-        }
-
-        function startStatusPolling() {
-            if (statusCheckInterval) {
-                clearInterval(statusCheckInterval);
-            }
-
-            statusCheckInterval = setInterval(async () => {
-                if (!currentProcessingId) return;
-
-                try {
-                    const response = await fetchWithPassword(`api/status/${currentProcessingId}`);
-                    if (!response.ok) {
-                        throw new Error('状态检查失败');
-                    }
-
-                    const status = await response.json();
-                    console.log(status)
-                    switch (status.status) {
-                        case 'completed':
-                            showProgress('处理完成!', 100);
-                            showStatus('全景图转换完成!', 'success');
-                            clearInterval(statusCheckInterval);
-
-                            setTimeout(() => {
-                                // 方法1：使用相对路径（推荐）
-                                const newURL = `panoramas/${currentProcessingId}/tour.html`;
-                                console.log('Opening URL:', newURL);
-                                window.open(newURL, '_blank');
-
-                                // 或者方法2：构建绝对路径
-                                // const baseURL = window.location.origin;
-                                // const newURL = `${baseURL}/panoramas/${currentProcessingId}/tour.html`;
-                                // window.open(newURL, '_blank');
-                            }, 1000);
-
-                            loadPanoramaList();
-
-                            break;
-                        case 'error':
-                            showStatus('处理失败: ' + status.error, 'error');
-                            clearInterval(statusCheckInterval);
-                            hideProgress();
-                            break;
-                        default:
-                            showProgress(status.status, status.progress);
-                    }
-
-                } catch (error) {
-                    console.error('状态检查错误:', error);
-                }
-            }, 2000);
-        }
-
-        function showProgress(text, percent) {
-            progressContainer.style.display = 'block';
-            progressFill.style.width = percent + '%';
-            progressText.textContent = text;
-        }
-
-        function hideProgress() {
-            progressContainer.style.display = 'none';
-            progressFill.style.width = '0%';
-        }
-
-        function showStatus(message, type) {
-            statusMessage.textContent = message;
-            statusMessage.className = 'status-message status-' + type;
-            statusMessage.style.display = 'block';
-
-            if (type === 'success' || type === 'error') {
-                setTimeout(() => {
-                    statusMessage.style.display = 'none';
-                }, 5000);
-            }
-        }
-
-        async function loadPanoramaList() {
-            try {
-                const response = await fetchWithPassword('api/panoramas');
-                
-                if (!response.ok) {
-                    const text = await response.text(); // 读取原始文本（可能不是 JSON）
-                    throw new Error(text || `HTTP 错误 ${response.status}`);
-                }
-
-                const panoramas = await response.json();
-
-                if (panoramas.length === 0) {
-                    panoramaList.innerHTML = '<div style="text-align: center; padding: 40px; color: #7f8c8d;">暂无全景图</div>';
-                    return;
-                }
-
-                panoramaList.innerHTML = panoramas.map(panorama => `
-                    <div class="panorama-item">
-                        <div class="panorama-info">
-                            <h3>${escapeHtml(panorama.name)}</h3>
-                            <div class="panorama-meta">
-                                ${new Date(panorama.createdAt).toLocaleDateString('zh-CN')} ${new Date(panorama.createdAt).toLocaleTimeString('zh-CN')}
-                            </div>
-                        </div>
-                        <a href="panoramas/${panorama.id}/tour.html" class="view-btn" target="_blank">查看</a>
-                    </div>
-                `).join('');
-
-            } catch (error) {
-                console.log(error)
-                panoramaList.innerHTML = `<div style="text-align: center; padding: 40px; color: #e74c3c;">加载失败：${error.message}</div>`;
-                console.error('加载全景图列表失败:', error);
-            }
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function showPasswordModal() {
-            document.getElementById('passwordModal').style.display = 'flex';
-            document.getElementById('passwordInput').value = accessPassword || '';
-            document.getElementById('passwordInput').focus();
-        }
-
-        document.getElementById('passwordSubmit').addEventListener('click', async () => {
-            const input = document.getElementById('passwordInput').value.trim();
-            if (!input) {
-                alert('请输入密码');
-                return;
-            }
-
-            try {
-                // 使用临时密码进行测试
-                const testResponse = await fetch('api/panoramas', {
-                    headers: {
-                        'X-Access-Token': input
-                    }
-                });
-
-                if (!testResponse.ok) {
-                    // 如果密码错误或未授权
-                    const text = await testResponse.text();
-                    alert('密码错误，请重新输入：' + text);
-                    return;
-                }
-
-                // 密码正确
-                accessPassword = input;
-                setCookie('accessPassword', accessPassword, 365); // 保存1年
-                document.getElementById('passwordModal').style.display = 'none';
-
-                // 重新加载全景图列表
-                loadPanoramaList();
-
-            } catch (error) {
-                alert('验证密码时出错：' + error.message);
-                console.error(error);
-            }
-        });
-
-
-        // 点击修改按钮弹出密码输入
-        document.getElementById('changePasswordBtn').addEventListener('click', showPasswordModal);
-
-        // 如果没有密码，启动时弹出
-        if(!accessPassword){
-            showPasswordModal();
-        }
-
-        // --- fetch 封装 ---
-        // 替换原来的 fetch 调用，加上 X-Access-Token
-        async function fetchWithPassword(url, options = {}) {
-            options.headers = options.headers || {};
-            if(accessPassword) {
-                options.headers['X-Access-Token'] = accessPassword;
-            }
-            return fetch(url, options);
-        }
-
-    </script>
+<script type="application/javascript" src="main.js"></script>
 </body>
 </html>

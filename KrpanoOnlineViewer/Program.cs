@@ -51,7 +51,28 @@ api.MapGet("/panoramas", GetAllPanoromas).WithOpenApi();
 api.MapPost("/upload", UploadFile).DisableAntiforgery();
 api.MapGet("/status/{id}", GetStatus).WithOpenApi();
 
+api.MapPut("/panoramas/{id}", RenameAsync ).WithOpenApi();
+
+// 删除全景图
+api.MapDelete("/panoramas/{id}", DeleteFileAsync).WithOpenApi();
 app.Run();
+
+async Task<IResult> RenameAsync(string id, [FromBody] PanoramaInfo request, PanoramaService panoramaService) 
+{
+    if (string.IsNullOrWhiteSpace(request.Name))
+    {
+        return Results.BadRequest("名称不能为空");
+    }
+    
+    var success = await panoramaService.UpdatePanoramaNameAsync(id, request.Name.Trim());
+    return success ? Results.Ok() : Results.NotFound();
+}
+
+async Task<IResult> DeleteFileAsync(string id, PanoramaService panoramaService) 
+{
+    var success = await panoramaService.DeletePanoramaAsync(id);
+    return success ? Results.Ok() : Results.NotFound();
+}
 
 async Task<IResult> UploadFile(HttpContext context, PanoramaService panoramaService, IFormFile file)
 {

@@ -1,0 +1,423 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%; /* 添加宽度100% */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* 确保body也是100%宽度 */
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* 添加宽度100% */
+}
+
+header {
+    background: #2c3e50;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+h1 {
+    font-size: 1.8em;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #bdc3c7;
+    font-size: 0.95em;
+}
+
+.main-content {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    flex: 1;
+    width: 100%; /* 添加宽度100% */
+    min-height: 0; /* 重要：允许网格项收缩 */
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        padding: 15px;
+        gap: 15px;
+    }
+
+    header {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .subtitle {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+
+    .main-content {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    header {
+        padding: 12px 15px;
+    }
+
+    h1 {
+        font-size: 1.3em;
+    }
+
+    .subtitle {
+        font-size: 0.85em;
+    }
+}
+
+.upload-section, .list-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+@media (max-width: 768px) {
+    .upload-section, .list-section {
+        padding: 15px;
+    }
+}
+
+.upload-area {
+    border: 3px dashed #3498db;
+    border-radius: 8px;
+    padding: 25px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #ecf0f1;
+}
+
+@media (max-width: 768px) {
+    .upload-area {
+        padding: 20px 12px;
+    }
+}
+
+.upload-area:hover {
+    border-color: #2980b9;
+    background: #d6dbdf;
+}
+
+.upload-area.highlight {
+    border-color: #27ae60;
+    background: #d5f4e6;
+}
+
+.upload-icon {
+    font-size: 40px;
+    color: #3498db;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .upload-icon {
+        font-size: 36px;
+        margin-bottom: 8px;
+    }
+}
+
+.file-input {
+    display: none;
+}
+
+.progress-container {
+    margin-top: 15px;
+    display: none;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 16px;
+    background: #ecf0f1;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 0.85em;
+}
+
+.list-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* 重要：允许内容收缩 */
+}
+
+.panorama-list {
+    margin-top: 10px;
+    flex: 1;
+    min-height: 0; /* 重要：允许内容收缩 */
+    overflow-y: auto;
+}
+
+.panorama-item {
+    background: white;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        padding: 15px;
+        gap: 15px;
+        min-height: 0;
+    }
+
+    .list-section {
+        padding: 15px;
+        min-height: 0;
+    }
+
+    .panorama-list {
+        min-height: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .panorama-item {
+        padding: 10px;
+        margin-bottom: 6px;
+    }
+}
+
+.panorama-info h3 {
+    color: #2c3e50;
+    margin-bottom: 4px;
+    font-size: 0.95em;
+    word-break: break-word;
+}
+
+.panorama-meta {
+    color: #7f8c8d;
+    font-size: 0.75em;
+}
+
+.panorama-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.view-btn, .edit-btn, .delete-btn {
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-size: 0.8em;
+    width: 50px;
+    transition: background-color 0.2s ease;
+}
+
+.view-btn {
+    background: #27ae60;
+}
+
+.view-btn:hover {
+    background: #219653;
+}
+
+.edit-btn {
+    background: #3498db;
+}
+
+.edit-btn:hover {
+    background: #2980b9;
+}
+
+.delete-btn {
+    background: #e74c3c;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+@media (max-width: 768px) {
+    .view-btn, .edit-btn, .delete-btn {
+        width: 45px;
+        padding: 4px 8px;
+        font-size: 0.75em;
+    }
+
+    .panorama-actions {
+        gap: 4px;
+    }
+}
+
+.status-message {
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 4px;
+    text-align: center;
+    display: none;
+    font-size: 0.9em;
+}
+
+.status-success {
+    background: #d5f4e6;
+    color: #27ae60;
+    border: 1px solid #27ae60;
+}
+
+.status-error {
+    background: #fadbd8;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.status-processing {
+    background: #d6eaf8;
+    color: #3498db;
+    border: 1px solid #3498db;
+}
+
+#changePasswordBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #2ecc71;
+    color: white;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background-color 0.2s ease;
+}
+
+#changePasswordBtn:hover {
+    background: #27ae60;
+}
+
+@media (max-width: 768px) {
+    #changePasswordBtn {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-top: 10px;
+    }
+}
+
+#passwordModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+#passwordModal > div {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 350px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 480px) {
+    #passwordModal > div {
+        padding: 15px;
+    }
+}
+
+#passwordInput {
+    width: 80%;
+    padding: 8px;
+    margin: 12px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+}
+
+#passwordInput:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+#passwordSubmit {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #3498db;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+#passwordSubmit:hover {
+    background: #2980b9;
+}
