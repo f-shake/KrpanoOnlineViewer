@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -122,6 +122,7 @@
         }
 
         .panorama-list {
+            margin-top: 12px;
             max-height: 400px;
             overflow-y: auto;
         }
@@ -219,7 +220,7 @@
                     <div class="progress-bar">
                         <div class="progress-fill" id="progressFill"></div>
                     </div>
-                    <div class="progress-text" id="progressText">准备上传</div>
+                    <div class="progress-text" id="progressText">正在上传</div>
                 </div>
 
                 <div class="status-message" id="statusMessage"></div>
@@ -306,7 +307,7 @@
             formData.append('file', file);
 
             try {
-                showProgress('准备上传', 0);
+                showProgress('正在上传', 0);
 
                 const response = await fetch('api/upload', {
                     method: 'POST',
@@ -320,7 +321,7 @@
                 const result = await response.json();
                 currentProcessingId = result.id;
 
-                showProgress('开始处理', 10);
+                showProgress('开始处理', 30);
                 startStatusPolling();
 
             } catch (error) {
@@ -384,7 +385,7 @@
         function showProgress(text, percent) {
             progressContainer.style.display = 'block';
             progressFill.style.width = percent + '%';
-            progressText.textContent = `${text} (${percent}%)`;
+            progressText.textContent = text;
         }
 
         function hideProgress() {
@@ -419,7 +420,7 @@
                         <div class="panorama-info">
                             <h3>${escapeHtml(panorama.name)}</h3>
                             <div class="panorama-meta">
-                                ${new Date(panorama.createdAt).toLocaleDateString('zh-CN')}
+                                ${new Date(panorama.createdAt).toLocaleDateString('zh-CN')} ${new Date(panorama.createdAt).toLocaleTimeString('zh-CN')}
                             </div>
                         </div>
                         <a href="panoramas/${panorama.id}/tour.html" class="view-btn" target="_blank">查看</a>

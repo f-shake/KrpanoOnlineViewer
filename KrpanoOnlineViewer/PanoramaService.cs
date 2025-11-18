@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SixLabors.ImageSharp;
 using System.Diagnostics;
 
 namespace KrpanoOnlineViewer;
@@ -68,7 +69,19 @@ public class PanoramaService
         return panoramaId;
     }
 
-    private async Task<bool> ConvertWithKrpanoAsync(string panoramaId, string inputFilePath, string outputDir)
+    private async Task<int> CheckImageAsync(string imagePath)
+    {
+        using Image image = await Image.LoadAsync(imagePath);
+        int width = image.Width;
+        int height = image.Height;
+        if (width != height * 2)
+        {
+            throw new Exception("图像宽高比必须为2:1");
+        }
+        return width;
+    }
+
+    private async Task<bool> ConvertWithKrpanoAsync(string panoramaId, string inputFilePath, string outputDir, int imageWidth)
     {
         try
         {
@@ -82,12 +95,12 @@ public class PanoramaService
 
             if (!File.Exists(krpanoToolPath))
             {
-                throw new FileNotFoundException("Krpano tool not found", krpanoToolPath);
+                throw new FileNotFoundException("没有找到krpanotools.exe文件", krpanoToolPath);
             }
 
             // 实际的krpano转换命令
             // 这里需要根据你的krpano版本和需求调整参数
-            var arguments = $"makepano -outputpath=\"{outputDir}\" \"{inputFilePath}\"";
+            var arguments = $"makepano -outputpath=\"{outputDir}\" -maxsize={imageWidth} -maxcubesize={imageWidth} \"{inputFilePath}\"";
 
             var processStartInfo = new ProcessStartInfo
             {
@@ -109,8 +122,7 @@ public class PanoramaService
             {
                 if (!string.IsNullOrWhiteSpace(e.Data))
                 {
-                    Console.WriteLine(e.Data);
-                    processingStatus[panoramaId].Status = "转换中：" + e.Data;
+                    UpdateProgress(panoramaId, e.Data);
                 }
             };
 
@@ -118,8 +130,7 @@ public class PanoramaService
             {
                 if (!string.IsNullOrWhiteSpace(e.Data))
                 {
-                    Console.WriteLine(e.Data);
-                    processingStatus[panoramaId].Status = "转换中：" + e.Data;
+                    UpdateProgress(panoramaId, e.Data);
                 }
             };
 
@@ -143,10 +154,11 @@ public class PanoramaService
         try
         {
             // 2. 调用krpano转换
-            status.Status = "转换中";
-            status.Progress = 30;
+            status.Status = "正在检测图片信息";
+            status.Progress = 40;
 
-            var success = await ConvertWithKrpanoAsync(panoramaId, sourceFile, outputDir);
+            int width = await CheckImageAsync(sourceFile);
+            var success = await ConvertWithKrpanoAsync(panoramaId, sourceFile, outputDir, width);
 
             if (success)
             {
@@ -169,7 +181,7 @@ public class PanoramaService
             {
                 status.Status = "error";
                 status.Progress = 0;
-                status.Error = "KRpano conversion failed";
+                status.Error = "转换失败";
             }
         }
         catch (Exception ex)
@@ -178,7 +190,7 @@ public class PanoramaService
             status.Error = ex.Message;
         }
     }
- 
+
     private async Task SavePanoramaInfoAsync(PanoramaInfo info)
     {
         var panoramas = await GetAllPanoramasAsync();
@@ -188,5 +200,24 @@ public class PanoramaService
         var json = System.Text.Json.JsonSerializer.Serialize(panoramas, AppJsonSerializerContext.Default.ListPanoramaInfo);
 
         await File.WriteAllTextAsync(infoFile, json);
+    }
+
+    private void UpdateProgress(string panoramaId, string output)
+    {
+        Console.WriteLine(output);
+        var status = processingStatus[panoramaId];
+        status.Status = "转换中：" + output;
+        if(output.Contains("loading"))
+        {
+            status.Progress = 50;
+        }
+        else if(output.Contains("making"))
+        {
+            status.Progress = 60;
+        }
+        else if(output.Contains("level"))
+        {
+            status.Progress = 80;
+        }
     }
 }
