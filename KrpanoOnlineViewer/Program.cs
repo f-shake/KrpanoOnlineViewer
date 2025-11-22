@@ -3,13 +3,24 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using System.Text.Json.Serialization.Metadata;
+using Microsoft.AspNetCore.Routing.Constraints;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddSingleton<PanoramaService>();
+builder.Host.UseWindowsService();
+builder.Host.UseSerilog();
+InitializeLogger(builder);
+
+//CreateSlimBuilder下需要加这些才能适配Swagger
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.SetParameterPolicy<RegexInlineRouteConstraint>("regex");
+});
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -28,6 +39,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
+InitializeGlobalExceptionHandler(app);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -39,8 +52,6 @@ if (app.Environment.IsDevelopment())
         .AllowAnyHeader());
 }
 
-app.UseHttpsRedirection();
-
 ConfigureAccessPassword(app, builder);
 
 InitializeStaticFiles(app);
@@ -51,24 +62,24 @@ api.MapGet("/panoramas", GetAllPanoromas).WithOpenApi();
 api.MapPost("/upload", UploadFile).DisableAntiforgery();
 api.MapGet("/status/{id}", GetStatus).WithOpenApi();
 
-api.MapPut("/panoramas/{id}", RenameAsync ).WithOpenApi();
+api.MapPut("/panoramas/{id}", RenameAsync).WithOpenApi();
 
 // 删除全景图
 api.MapDelete("/panoramas/{id}", DeleteFileAsync).WithOpenApi();
 app.Run();
 
-async Task<IResult> RenameAsync(string id, [FromBody] PanoramaInfo request, PanoramaService panoramaService) 
+async Task<IResult> RenameAsync(string id, [FromBody] PanoramaInfo request, PanoramaService panoramaService)
 {
     if (string.IsNullOrWhiteSpace(request.Name))
     {
         return Results.BadRequest("名称不能为空");
     }
-    
+
     var success = await panoramaService.UpdatePanoramaNameAsync(id, request.Name.Trim());
     return success ? Results.Ok() : Results.NotFound();
 }
 
-async Task<IResult> DeleteFileAsync(string id, PanoramaService panoramaService) 
+async Task<IResult> DeleteFileAsync(string id, PanoramaService panoramaService)
 {
     var success = await panoramaService.DeletePanoramaAsync(id);
     return success ? Results.Ok() : Results.NotFound();
@@ -159,5 +170,41 @@ void ConfigureAccessPassword(WebApplication webApplication, WebApplicationBuilde
         }
 
         await next();
+    });
+}
+
+
+void InitializeLogger(WebApplicationBuilder builder)
+{
+    Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Information()
+        .WriteTo.File(
+            Path.Combine(AppContext.BaseDirectory, "logs", "app.log"),
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 7)
+        .WriteTo.Console()
+        .CreateLogger();
+
+    Log.Information("logger初始化完成");
+}
+
+
+void InitializeGlobalExceptionHandler(WebApplication app)
+{
+    app.Use(async (context, next) =>
+    {
+        try
+        {
+            await next();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "全局未捕获异常：{Path}", context.Request.Path);
+
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "application/json";
+
+            await context.Response.WriteAsync(ex.Message);
+        }
     });
 }

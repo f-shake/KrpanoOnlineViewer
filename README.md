@@ -17,17 +17,29 @@
 1. 获取程序文件
    - 从[Release](https://github.com/f-shake/KrpanoOnlineViewer/releases)下载。
    - 使用源代码手动编译，确保已安装.NET 8 SDK，执行打包命令进行编译，示例：`dotnet publish KrpanoOnlineViewer -c Release -o Publish  --runtime win-x64`。本程序兼容AOT，建议打包时启用AOT。提供了一个脚本`build_win64_aot.ps1`，可一键发布为Windows 64位应用。
+
 2. 修改配置文件`appsettings.json`
    - 修改`AccessPassword`，设置访问密码（例如：`"AccessPassword":"123456",`）
    - 修改`KrpanoExe`，指定`krpanotools.exe`的绝对文件路径（例如：`"KrpanoExe": "C:\\Users\\autod\\Documents\\Apps\\krpano-1.23.1\\krpanotools.exe"`
+
 3. 运行一遍`Krpano Tools`，完成软件的注册
-4. 选择合适的部署方式。可以直接打开可执行文件，使用内置的Kestrel服务器提供Web服务；也可以通过IIS进行部署。本人使用直接打开可执行文件使用Kestrel服务器，然后使用Nginx进行反向代理的方式使用。注意，该后端需要支持上传大容量的文件，因此包括Nginx在内的所涉服务器，需要配置合理的请求体大小。例如，在nginx中，需要在`server`节中配置`client_max_body_size 1000M;`。
+
+4. 选择合适的部署方式。
+
+   - 直接打开可执行文件，使用内置的Kestrel服务器提供Web服务
+
+   - 通过IIS进行部署，此时需要手动构建非AOT版本的二进制文件
+
+   - 在Windows上，通过Windows服务进行托管。可以运行`CreateWindowsService.bat`注册服务，`DeleteWindowsService.bat`删除服务。
+
+     > 本人使用直接打开可执行文件使用Kestrel服务器，然后使用Nginx进行反向代理的方式使用。注意，该后端需要支持上传大容量的文件，因此包括Nginx在内的所涉服务器，需要配置合理的请求体大小。例如，在nginx中，需要在`server`节中配置`client_max_body_size 1000M;`。
+
 5. 输入对应的地址进行访问。
 
 ## 编译和开发
 
 1. 编辑`KrpanoOnlineViewer.csproj`，删除`OutputPath`配置块和`BaseIntermediateOutputPath`配置块
-2. 构建
+2. 尝试生成解决方案
 
 ## 注意
 

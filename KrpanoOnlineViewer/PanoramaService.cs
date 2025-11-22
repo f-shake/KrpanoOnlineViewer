@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SixLabors.ImageSharp;
 using System.Diagnostics;
+using Serilog;
 
 namespace KrpanoOnlineViewer;
 
@@ -146,7 +147,7 @@ public class PanoramaService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            Log.Error(ex, "执行krpano转换失败");
             throw;
         }
     }
@@ -209,7 +210,7 @@ public class PanoramaService
 
     private void UpdateProgress(string panoramaId, string output)
     {
-        Console.WriteLine(output);
+        Log.Information("krpano输出：{Output}", output);
         var status = processingStatus[panoramaId];
         status.Status = "转换中：" + output;
         if (output.Contains("loading"))
@@ -267,8 +268,7 @@ public class PanoramaService
             }
             catch (Exception ex)
             {
-                // 记录日志，但不阻止操作
-                Console.WriteLine($"删除目录失败: {ex.Message}");
+                Log.Error(ex, "删除全景图目录失败：{Id}", id);
             }
         }
 
