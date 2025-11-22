@@ -30,7 +30,7 @@
 
    - 通过IIS进行部署，此时需要手动构建非AOT版本的二进制文件
 
-   - 在Windows上，通过Windows服务进行托管。可以运行`CreateWindowsService.bat`注册服务，`DeleteWindowsService.bat`删除服务。
+   - 在Windows上，通过Windows服务进行托管。可以运行`CreateWindowsService.bat`注册服务，`DeleteWindowsService.bat`删除服务。注意，由于Windows服务运行在SYSTEM用户下，而我们一般会在自己登录的用户下对Krpano进行激活。因此，默认状态下，这个服务调用的Krpono会提示未激活。此时，需要进入Services.msc，找到`KrpanoOnlineViewer`服务，双击打开属性，进入登录选项卡，选择“此账户”并输入用户名和密码。然后，重启服务。
 
      > 本人使用直接打开可执行文件使用Kestrel服务器，然后使用Nginx进行反向代理的方式使用。注意，该后端需要支持上传大容量的文件，因此包括Nginx在内的所涉服务器，需要配置合理的请求体大小。例如，在nginx中，需要在`server`节中配置`client_max_body_size 1000M;`。
 
